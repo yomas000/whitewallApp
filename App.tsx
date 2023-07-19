@@ -14,7 +14,8 @@ import {
   View,
   ScrollView,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  StatusBar
 } from 'react-native';
 
 import styles from './Style';
@@ -63,6 +64,7 @@ function App(): JSX.Element {
 
     var server = getData();
     server.then(thing => {
+      
       setData(JSON.parse(String(thing)));
 
       storeData("data", JSON.stringify(thing)).then(value => {
@@ -85,10 +87,11 @@ function App(): JSX.Element {
 
   return (
     <View style={{ flex: 1 }}>
+      <StatusBar backgroundColor={styles.background.backgroundColor}/>
       {isloading ? (
-        <View style={{ flex: 1, justifyContent: 'center', backgroundColor: "white" }}>
+        <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.background.backgroundColor }}>
           {
-            <Image source={logo} style={{ width: "100%", height: 200 }} />
+            <Image source={logo} style={styles.loading} />
           }
         </View>
       ) : (

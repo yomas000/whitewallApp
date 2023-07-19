@@ -1,6 +1,6 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Button, Alert, Image, ImageBackground, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Button, Alert, Image, ImageBackground, Linking, BackHandler } from 'react-native';
 import { Card } from 'react-native-paper';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { setWallpaper } from 'react-native-phone-wallpaper';
 import styles from './Style';
 import SelectDropdown from 'react-native-select-dropdown'
@@ -17,6 +17,8 @@ const CategoryScreen = ({ navigation, route }: any) => {
     var [imageScreen, setImageScreen] = useState("None");
     var [spinner, setSpinner] = useState(false);
     var [imageLoading, setImageLoading] = useState(true);
+    const [scrollToIndex, setScrollToIndex] = useState(0);
+    const [imagesScrollRef, setImageRef] = useState<ScrollView>(); // create ref
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('tabPress', (e: any) => {
@@ -27,12 +29,39 @@ const CategoryScreen = ({ navigation, route }: any) => {
         return unsubscribe;
     }, [navigation]);
 
+    useEffect(() => {
+        const backAction = () => {
+
+            if (imageScreen != "None"){
+                setImageScreen("None");
+                setImageLoading(true);
+                imagesScrollRef?.scrollTo({x: 0, y: scrollToIndex, animated: true});
+
+                return true;
+            }
+
+            if (selectedCollection != "collections"){
+                setCollection("collections");
+                return true;
+            }
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+        );
+
+        return () => backHandler.remove();
+    }, [imageScreen, selectedCollection]);
+
+
+
     return (
         selectedCollection == "collections" ? (
             <>
                 <View>
-                    <Image source={header} style={{ width: "100%", height: 150 }} />
-                    <View style={styles.dropdown_background}>
+                    <Image source={header} style={styles.header} />
+                    {/* <View style={styles.dropdown_background}>
                         <SelectDropdown
                             data={options}
                             defaultValueByIndex={0}
@@ -51,7 +80,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                             rowStyle={styles.dropdown1RowStyle}
                             rowTextStyle={styles.dropdown1RowTxtStyle}
                         />
-                    </View>
+                    </View> */}
                 </View>
                 <ScrollView style={styles.background}>
                     <View style={{ flex: 1, alignItems: "center", justifyContent: 'center', paddingBottom: 25 }}>
@@ -64,7 +93,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
         ) : (
 
             imageScreen == "None" ? (
-                <ScrollView style={styles.background}>
+                    <ScrollView style={styles.background} onScroll={(object) => { setScrollToIndex(object.nativeEvent.contentOffset.y) }} ref={ref => { setImageRef(ref as any); }} onLayout={() => {imagesScrollRef?.scrollTo({x: 0, y: scrollToIndex, animated: true})}}>
                     <View style={{ flex: 1, alignItems: "center", justifyContent: 'center', paddingBottom: 25 }}>
                         <TouchableOpacity onPress={() => setCollection("collections")} style={styles.button}>
                             <Text style={styles.button_text}>Back</Text>
@@ -75,22 +104,22 @@ const CategoryScreen = ({ navigation, route }: any) => {
                     </View>
                 </ScrollView>
             ) : (
-                <ImageBackground source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} style={styles.wallpaper_image} onLoad={() => {setImageLoading(false)}}>
+                <ImageBackground source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} style={styles.wallpaper_image} onLoad={() => { setImageLoading(false) }}>
                     <Spinner
                         visible={spinner}
                         textContent={'Setting Wallpaper...'}
                         overlayColor="rgba(0, 0, 0, 0.75)"
                         animation='slide'
                     />
-                    <TouchableOpacity onPress={() => {setImageScreen("None"); setImageLoading(true)}} style={styles.button}>
+                    <TouchableOpacity onPress={() => { setImageScreen("None"); setImageLoading(true); }} style={styles.button}>
                         <Text style={styles.button_text}>Back</Text>
                     </TouchableOpacity>
 
                     <View style={{ height: "80%" }}>
                         {
                             imageLoading ? (
-                                <View style={{ flex: 1, justifyContent: 'center'}}>
-                                    <ActivityIndicator size={"large"}/>
+                                <View style={{ flex: 1, justifyContent: 'center' }}>
+                                    <ActivityIndicator size={"large"} />
                                 </View>
                             ) : (
                                 <View></View>
@@ -98,7 +127,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         }
                     </View>
                     <TouchableOpacity onPress={() => goToLink(collections[selectedCollection]["images"][imageScreen]["link"])}>
-                        <Text style={{fontSize: 20}}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
+                        <Text style={{ fontSize: 20 }}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner)} style={styles.button}>
@@ -111,7 +140,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
 };
 
 const goToLink = (link: string) => {
-    if (link != "" && link != null){
+    if (link != "" && link != null) {
         Linking.openURL(link).catch(error => {
 
         })
@@ -195,13 +224,43 @@ const displayImages = (collections: any, selectedCollection: any, setImageScreen
 }
 
 const changeWallpaper = (url: string, setSpinner: Function) => {
-    setSpinner(true);
+    Alert.alert("Set Wallpaper", "Lock Screen | Home Screen | Both", [
+        {
+            text: "Both", onPress: () => {
+                setSpinner(true);
 
-    setWallpaper(url).then(result => {
-        setSpinner(false);
-    }).catch(error => {
+                setWallpaper(url, "3").then(result => {
+                    setSpinner(false);
+                }).catch(error => {
 
-    })
+                })
+            }
+        },
+        {
+            text: "Home", onPress: () => {
+                setSpinner(true);
+
+                setWallpaper(url, "1").then(result => {
+                    setSpinner(false);
+                }).catch(error => {
+
+                })
+            }
+        },
+        {
+            text: "Lock", onPress: () => {
+                setSpinner(true);
+
+                setWallpaper(url, "2").then(result => {
+                    setSpinner(false);
+                }).catch(error => {
+
+                })
+            }
+        }
+    ]
+    )
+
 }
 
 export default CategoryScreen

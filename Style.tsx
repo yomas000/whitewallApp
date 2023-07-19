@@ -17,6 +17,18 @@ const styles = StyleSheet.create({
         activeColor: "white",
         inactiveColor: "lightgray",
     },
+
+    //loading Image
+    loading: {
+        width: "100%",
+        height: "auto"
+    },
+
+    //header
+    header: {
+        width: "100%",
+        height: "auto"
+    },
     
     //
     card: {
