@@ -12,28 +12,18 @@ const styles = StyleSheet.create({
         backgroundColor: "white"
     },
 
-    maskedView: {
-       width: "100%",
-       height: '100%'
-    },
-    maskWrapper: {
-        backgroundColor: 'transparent',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 100,
-        height: 100
-    },
-    mask: {
-        width: 411,
-        height: 1000,
-        backgroundColor: '#000',
-    },
-
     //categories
     tabStyle: {
         backgroundColor: "lightblue",
         activeColor: "white",
         inactiveColor: "white",
+    },
+
+    //call to action
+    action: {
+        fontSize: 10, 
+        textAlign: 'center',
+        color: "white"
     },
 
     //loading Image

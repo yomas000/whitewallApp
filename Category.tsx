@@ -116,7 +116,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={{ fontSize: 20, textAlign: "center" }}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
 
                         <TouchableOpacity onPress={() => { goToLink(JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).link) }}>
-                            <Text style={{ fontSize: 10, textAlign: 'center' }}>{JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).name}</Text>
+                            <Text style={styles.action}>{JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).name}</Text>
                         </TouchableOpacity>
                     </View>
 
