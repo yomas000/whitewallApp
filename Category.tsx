@@ -1,15 +1,17 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Button, Alert, Image, ImageBackground, Linking, BackHandler } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Button, Alert, Image, ImageBackground, Linking, BackHandler, Dimensions } from 'react-native';
 import { Card } from 'react-native-paper';
 import React, { useState, useRef, useEffect } from 'react';
 import { setWallpaper } from 'react-native-phone-wallpaper';
 import styles from './Style';
-import SelectDropdown from 'react-native-select-dropdown'
 import Spinner from 'react-native-loading-spinner-overlay';
+import ImageZoom from 'react-native-image-pan-zoom';
 import header from "./Icons/appHeading.jpeg";
 
 const base_url = "https://dev.whitewall.app";
 const apiKey = "?apikey=2a41067bfde14602117d84995e53a2543ebf24db36d44c103323e2edb4b6fdb1";
 const options = ["Change: Never", "Change: Every Day", "Change: Every other Day", "Change: Every Week"]
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
 const CategoryScreen = ({ navigation, route }: any) => {
     var collections = route.params.collections.collections;
@@ -19,6 +21,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
     var [imageLoading, setImageLoading] = useState(true);
     const [scrollToIndex, setScrollToIndex] = useState(0);
     const [imagesScrollRef, setImageRef] = useState<ScrollView>(); // create ref
+    const [imagePosition, setImagePos] = useState<Object>();
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('tabPress', (e: any) => {
@@ -32,15 +35,15 @@ const CategoryScreen = ({ navigation, route }: any) => {
     useEffect(() => {
         const backAction = () => {
 
-            if (imageScreen != "None"){
+            if (imageScreen != "None") {
                 setImageScreen("None");
                 setImageLoading(true);
-                imagesScrollRef?.scrollTo({x: 0, y: scrollToIndex, animated: true});
+                imagesScrollRef?.scrollTo({ x: 0, y: scrollToIndex, animated: true });
 
                 return true;
             }
 
-            if (selectedCollection != "collections"){
+            if (selectedCollection != "collections") {
                 setCollection("collections");
                 return true;
             }
@@ -59,28 +62,8 @@ const CategoryScreen = ({ navigation, route }: any) => {
     return (
         selectedCollection == "collections" ? (
             <>
-                <View>
-                    <Image source={header} style={styles.header} />
-                    {/* <View style={styles.dropdown_background}>
-                        <SelectDropdown
-                            data={options}
-                            defaultValueByIndex={0}
-                            onSelect={(selectedItem, index) => {
-                                console.log(selectedItem, index);
-                            }}
-                            buttonTextAfterSelection={(selectedItem, index) => {
-                                return selectedItem;
-                            }}
-                            rowTextForSelection={(item, index) => {
-                                return item;
-                            }}
-                            buttonStyle={styles.dropdown1BtnStyle}
-                            buttonTextStyle={styles.dropdown1BtnTxtStyle}
-                            dropdownStyle={styles.dropdown1DropdownStyle}
-                            rowStyle={styles.dropdown1RowStyle}
-                            rowTextStyle={styles.dropdown1RowTxtStyle}
-                        />
-                    </View> */}
+                <View style={styles.header_container}>
+                    <Image source={header} style={styles.header} resizeMode='contain'/>
                 </View>
                 <ScrollView style={styles.background}>
                     <View style={{ flex: 1, alignItems: "center", justifyContent: 'center', paddingBottom: 25 }}>
@@ -93,7 +76,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
         ) : (
 
             imageScreen == "None" ? (
-                    <ScrollView style={styles.background} onScroll={(object) => { setScrollToIndex(object.nativeEvent.contentOffset.y) }} ref={ref => { setImageRef(ref as any); }} onLayout={() => {imagesScrollRef?.scrollTo({x: 0, y: scrollToIndex, animated: true})}}>
+                <ScrollView style={styles.background} onScroll={(object) => { setScrollToIndex(object.nativeEvent.contentOffset.y) }} ref={ref => { setImageRef(ref as any); }} onLayout={() => { imagesScrollRef?.scrollTo({ x: 0, y: scrollToIndex, animated: true }) }}>
                     <View style={{ flex: 1, alignItems: "center", justifyContent: 'center', paddingBottom: 25 }}>
                         <TouchableOpacity onPress={() => setCollection("collections")} style={styles.button}>
                             <Text style={styles.button_text}>Back</Text>
@@ -104,7 +87,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                     </View>
                 </ScrollView>
             ) : (
-                <ImageBackground source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} style={styles.wallpaper_image} onLoad={() => { setImageLoading(false) }}>
+                <View style={styles.background}>
                     <Spinner
                         visible={spinner}
                         textContent={'Setting Wallpaper...'}
@@ -115,25 +98,32 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={styles.button_text}>Back</Text>
                     </TouchableOpacity>
 
-                    <View style={{ height: "80%" }}>
+                    <ImageZoom cropWidth={365} cropHeight={550} imageHeight={550} imageWidth={365} style={{backgroundColor: "black"}} pinchToZoom={true} onMove={(element) => {setImagePos(element)}}>
+                        <ImageBackground style={{ width: "auto", height: "100%" }} source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} onLoad={() => {setImageLoading(false)}}>
                         {
                             imageLoading ? (
                                 <View style={{ flex: 1, justifyContent: 'center' }}>
                                     <ActivityIndicator size={"large"} />
                                 </View>
                             ) : (
-                                <View></View>
+                                <></>
                             )
                         }
+                        </ImageBackground>
+                    </ImageZoom>
+        
+                    <View style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", borderRadius: 10, padding: 5, margin: 5 }}>
+                        <Text style={{ fontSize: 20, textAlign: "center" }}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
+
+                        <TouchableOpacity onPress={() => { goToLink(JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).link) }}>
+                            <Text style={{ fontSize: 10, textAlign: 'center' }}>{JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).name}</Text>
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={() => goToLink(collections[selectedCollection]["images"][imageScreen]["link"])}>
-                        <Text style={{ fontSize: 20 }}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
-                    </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner)} style={styles.button}>
                         <Text style={styles.button_text}>Set Wallpaper</Text>
                     </TouchableOpacity>
-                </ImageBackground>
+                </View>
             )
         )
     );
@@ -224,6 +214,9 @@ const displayImages = (collections: any, selectedCollection: any, setImageScreen
 }
 
 const changeWallpaper = (url: string, setSpinner: Function) => {
+    Image.getSize(url, (width, height) => {console.log("Image: " + width + "x" + height);});
+    console.log(width + "x" + height);
+    
     Alert.alert("Set Wallpaper", "Lock Screen | Home Screen | Both", [
         {
             text: "Both", onPress: () => {

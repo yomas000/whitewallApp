@@ -44,23 +44,6 @@ function App(): JSX.Element {
   const [loadingIcon, setIcon] = useState("app");
 
   useEffect(() => {
-    getStoredData("branding").then(value => {
-
-      setBranding(JSON.parse(JSON.stringify(value)));
-      setIcon("branding")
-
-    }).catch(reason => {
-      var serverRequest = getBranding()
-      serverRequest.then(thing => {
-        storeData("branding", JSON.stringify(thing)).then(test => { }).catch(reason => { });
-
-        setBranding(JSON.parse(String(thing)))
-        setIcon("branding")
-      }).catch(reason2 => {
-
-      })
-    })
-
 
     var server = getData();
     server.then(thing => {
@@ -74,7 +57,8 @@ function App(): JSX.Element {
       })
 
     }).catch(reason => {
-
+      console.log(reason);
+      
       getStoredData("data").then(value => {
         setData(JSON.parse(String(value)));
         setLoading(false);
@@ -91,15 +75,14 @@ function App(): JSX.Element {
       {isloading ? (
         <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.background.backgroundColor }}>
           {
-            <Image source={logo} style={styles.loading} />
+            <Image source={logo} style={styles.loading} resizeMode='contain'/>
           }
         </View>
       ) : (
         <NavigationContainer>
-            <Tab.Navigator barStyle={styles.tabStyle} activeColor={styles.tabStyle.activeColor} inactiveColor={styles.tabStyle.inactiveColor}>
+            <Tab.Navigator barStyle={styles.tabStyle} activeColor={styles.tabStyle.activeColor} inactiveColor={styles.tabStyle.inactiveColor} shifting={false}>
               {Object.keys(data).map((category) => (
-                <Tab.Screen key={category} name={category} component={CategoryScreen} initialParams={{ collections: data[category] }} />
-              ))}
+                <Tab.Screen key={category} name={category} component={CategoryScreen} initialParams={{ collections: data[category] }} options={{tabBarIcon: () => {return (<Image source={{ uri: base_url + data[category]["image"] + apiKey }} style={{width: 50, height: 35}}/>)}}}/>))}
             </Tab.Navigator>
         </NavigationContainer>
       )}

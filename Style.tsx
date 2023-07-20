@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     //background
     background: {
+        flex: 1,
         padding: 24,
         backgroundColor: "white",
     },
@@ -11,23 +12,52 @@ const styles = StyleSheet.create({
         backgroundColor: "white"
     },
 
+    maskedView: {
+       width: "100%",
+       height: '100%'
+    },
+    maskWrapper: {
+        backgroundColor: 'transparent',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 100,
+        height: 100
+    },
+    mask: {
+        width: 411,
+        height: 1000,
+        backgroundColor: '#000',
+    },
+
     //categories
     tabStyle: {
-        backgroundColor: "gray",
+        backgroundColor: "lightblue",
         activeColor: "white",
-        inactiveColor: "lightgray",
+        inactiveColor: "white",
     },
 
     //loading Image
     loading: {
+        flex: 1,
         width: "100%",
-        height: "auto"
+        alignSelf: "center"
     },
 
     //header
     header: {
-        width: "100%",
-        height: "auto"
+       flex: 1,
+       //branding
+       width: 500,
+       alignSelf: "center",
+    },
+
+    header_container: { 
+        width: "100%", 
+        height: "auto", 
+        flex: 0.2,
+        
+        //branding
+        backgroundColor: "white"
     },
     
     //
@@ -72,8 +102,7 @@ const styles = StyleSheet.create({
 
     button: {
         width: "95%",
-        height: 40,
-        flex: 1,
+        height: 50,
         margin: 5,
         alignItems: "center", 
         justifyContent: 'center',
@@ -93,11 +122,12 @@ const styles = StyleSheet.create({
     },
 
     wallpaper_image: {
-        width: "100%",
-        height: "100%",
+        width: 300,
+        height: 700,
         flex: 1,
-        alignItems: "center",
-        justifyContent: 'center',
+        alignSelf: "center",
+
+        backgroundColor: 'rgba(0, 0, 0, 0.1)',
     },
 
     dropdown1BtnStyle: {
