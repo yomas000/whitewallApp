@@ -11,8 +11,8 @@ const base_url = "https://dev.whitewall.app";
 const apiKey = "?apikey=2a41067bfde14602117d84995e53a2543ebf24db36d44c103323e2edb4b6fdb1";
 
 const options = ["Change: Never", "Change: Every Day", "Change: Every other Day", "Change: Every Week"]
-const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
+const phonewidth = Dimensions.get('window').width;
+const phoneheight = Dimensions.get('window').height;
 
 const CategoryScreen = ({ navigation, route }: any) => {
     var collections = route.params.collections.collections;
@@ -23,6 +23,8 @@ const CategoryScreen = ({ navigation, route }: any) => {
     const [scrollToIndex, setScrollToIndex] = useState(0);
     const [imagesScrollRef, setImageRef] = useState<ScrollView>(); // create ref
     const [imagePosition, setImagePos] = useState<Object>();
+    const [imageWidth, setImageWidth] = useState(500);
+    const [imageHeight, setImageHeight] = useState(500);
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('tabPress', (e: any) => {
@@ -83,7 +85,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                             <Text style={styles.button_text}>Back</Text>
                         </TouchableOpacity>
                         {
-                            displayImages(collections, selectedCollection, setImageScreen)
+                            displayImages(collections, selectedCollection, setImageScreen, setImageWidth, setImageHeight)
                         }
                     </View>
                 </ScrollView>
@@ -99,7 +101,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={styles.button_text}>Back</Text>
                     </TouchableOpacity>
 
-                    <ImageZoom cropWidth={width/2} cropHeight={height/2} imageHeight={getImageHeight(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey)} imageWidth={getImageWidth(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey)} style={{ backgroundColor: "black", aspectRatio: 9/16, alignSelf: "center" }} pinchToZoom={true} onMove={(element) => { setImagePos(element) }}>
+                    <ImageZoom cropWidth={phonewidth/1.5} cropHeight={phoneheight/1.5} imageHeight={imageHeight} imageWidth={imageWidth} style={{ backgroundColor: "black", alignSelf: "center" }} enableCenterFocus={false} pinchToZoom={true} onMove={(element) => { setImagePos(element) }}>
                         <ImageBackground style={{ width: "auto", height: "100%" }} source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} onLoad={() => { setImageLoading(false) }}>
                             {
                                 imageLoading ? (
@@ -119,7 +121,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={styles.action}>{JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).name}</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => { changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner); track("wallpaper", imageScreen) }} style={styles.button}>
+                    <TouchableOpacity onPress={() => { changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner, imagePosition); track("wallpaper", imageScreen) }} style={styles.button}>
                         <Text style={styles.button_text}>Set Wallpaper</Text>
                     </TouchableOpacity>
                 </View>
@@ -165,7 +167,7 @@ const displayCollections = (collections: any, setCollection: any) => {
     )
 }
 
-const displayImages = (collections: any, selectedCollection: any, setImageScreen: Function) => {
+const displayImages = (collections: any, selectedCollection: any, setImageScreen: Function, setImageWidth: Function, setImageHeight: Function) => {
     const views = [];
 
     for (let i = 0; i < Object.keys(collections[selectedCollection]["images"]).length; i += 2) {
@@ -175,7 +177,7 @@ const displayImages = (collections: any, selectedCollection: any, setImageScreen
 
         views.push(
             <View key={i} style={{ flex: 1, flexDirection: "row" }}>
-                <TouchableOpacity key={element} onPress={() => setImageScreen(element)}>
+                <TouchableOpacity key={element} onPress={() => { setImageScreen(element); setImageDimentions(base_url + collections[selectedCollection]["images"][element]["imagePath"] + apiKey, setImageWidth, setImageHeight)}}>
                     <Card style={styles.card}>
                         <Image source={{ uri: base_url + collections[selectedCollection]["images"][element]["thumbnail"] + apiKey }} style={styles.card_images} />
                         <Text style={styles.card_label}>{element}</Text>
@@ -183,7 +185,7 @@ const displayImages = (collections: any, selectedCollection: any, setImageScreen
                 </TouchableOpacity>
                 {
                     i != Object.keys(collections[selectedCollection]["images"]).length - 1 ? (
-                        <TouchableOpacity key={element2} onPress={() => setImageScreen(element2)}>
+                        <TouchableOpacity key={element2} onPress={() => { setImageScreen(element2); setImageDimentions(base_url + collections[selectedCollection]["images"][element2]["imagePath"] + apiKey, setImageWidth, setImageHeight) }}>
                             <Card style={styles.card}>
                                 <Image source={{ uri: base_url + collections[selectedCollection]["images"][element2]["thumbnail"] + apiKey }} style={styles.card_images} />
                                 <Text style={styles.card_label}>{element2}</Text>
@@ -204,22 +206,11 @@ const displayImages = (collections: any, selectedCollection: any, setImageScreen
     )
 }
 
-var getImageWidth = (url: string) => {
-    var val = 500;
+var setImageDimentions = (url: string, setImageWidth: Function, setImageHeight: Function) => {
     Image.getSize(url, (width, height) => {
-        val = width;
+        setImageWidth(width * (PixelRatio.get() / 2));
+        setImageHeight(height * (PixelRatio.get() / 2));
     })
-
-    return val * (PixelRatio.get() / 2);
-}
-
-var getImageHeight = (url: string) => {
-    var val = 500;
-    Image.getSize(url, (width, height) => {
-        val = height;
-    })
-
-    return val * (PixelRatio.get() / 2);
 }
 /**
  * 
@@ -229,14 +220,16 @@ var getImageHeight = (url: string) => {
 const track = (type: string, imagename: string) => {
     console.log(imagename);
 
-    fetch(base_url + "/requests/v1/tracking", {
-        method: "POST",
-        headers: {
-            Accept: 'application/x-www-form-urlencoded',
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: "apikey="+apiKey.replace("?apikey=", "")+"&type="+type+"&name="+imagename
-    }).then(test => {
+    fetch(base_url + "/requests/v1/tracking", 
+        {
+            method: "POST",
+            headers: {
+                Accept: 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: "apikey="+apiKey.replace("?apikey=", "")+"&type="+type+"&name="+imagename
+        }
+    ).then(test => {
 
     }).catch(error => {
 
@@ -251,9 +244,11 @@ const goToLink = (link: string) => {
     }
 }
 
-const changeWallpaper = (url: string, setSpinner: Function) => {
-    Image.getSize(url, (width, height) => { console.log("Image: " + width + "x" + height); });
-    console.log(width + "x" + height);
+const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) => {
+
+    setSpinner(false);
+    console.log(imagePosition);
+    
 
     Alert.alert("Set Wallpaper", "Lock Screen | Home Screen | Both", [
         {
