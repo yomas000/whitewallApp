@@ -227,7 +227,7 @@ const track = (type: string, imagename: string) => {
                 Accept: 'application/x-www-form-urlencoded',
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: "apikey="+apiKey.replace("?apikey=", "")+"&type="+type+"&name="+imagename
+            body: "apikey=" + apiKey.slice(8, apiKey.length) +"&type="+type+"&name="+imagename
         }
     ).then(test => {
 
