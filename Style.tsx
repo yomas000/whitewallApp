@@ -91,11 +91,12 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        width: "95%",
+        width: "100%",
         height: 50,
         margin: 5,
         alignItems: "center", 
         justifyContent: 'center',
+        alignSelf: "center",
 
         //branding
         backgroundColor: "#03a5fc",

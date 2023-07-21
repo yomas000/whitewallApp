@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Button, Alert, Image, ImageBackground, Linking, BackHandler, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Button, Alert, Image, ImageBackground, Linking, BackHandler, Dimensions, PixelRatio } from 'react-native';
 import { Card } from 'react-native-paper';
 import React, { useState, useRef, useEffect } from 'react';
 import { setWallpaper } from 'react-native-phone-wallpaper';
@@ -9,6 +9,7 @@ import header from "./Icons/appHeading.jpeg";
 
 const base_url = "https://dev.whitewall.app";
 const apiKey = "?apikey=2a41067bfde14602117d84995e53a2543ebf24db36d44c103323e2edb4b6fdb1";
+
 const options = ["Change: Never", "Change: Every Day", "Change: Every other Day", "Change: Every Week"]
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
@@ -63,7 +64,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
         selectedCollection == "collections" ? (
             <>
                 <View style={styles.header_container}>
-                    <Image source={header} style={styles.header} resizeMode='contain'/>
+                    <Image source={header} style={styles.header} resizeMode='contain' />
                 </View>
                 <ScrollView style={styles.background}>
                     <View style={{ flex: 1, alignItems: "center", justifyContent: 'center', paddingBottom: 25 }}>
@@ -98,29 +99,27 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={styles.button_text}>Back</Text>
                     </TouchableOpacity>
 
-                    <ImageZoom cropWidth={365} cropHeight={550} imageHeight={550} imageWidth={365} style={{backgroundColor: "black"}} pinchToZoom={true} onMove={(element) => {setImagePos(element)}}>
-                        <ImageBackground style={{ width: "auto", height: "100%" }} source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} onLoad={() => {setImageLoading(false)}}>
-                        {
-                            imageLoading ? (
-                                <View style={{ flex: 1, justifyContent: 'center' }}>
-                                    <ActivityIndicator size={"large"} />
-                                </View>
-                            ) : (
-                                <></>
-                            )
-                        }
+                    <ImageZoom cropWidth={width/2} cropHeight={height/2} imageHeight={getImageHeight(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey)} imageWidth={getImageWidth(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey)} style={{ backgroundColor: "black", aspectRatio: 9/16, alignSelf: "center" }} pinchToZoom={true} onMove={(element) => { setImagePos(element) }}>
+                        <ImageBackground style={{ width: "auto", height: "100%" }} source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} onLoad={() => { setImageLoading(false) }}>
+                            {
+                                imageLoading ? (
+                                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                                        <ActivityIndicator size={"large"} />
+                                    </View>
+                                ) : (
+                                    <></>
+                                )
+                            }
                         </ImageBackground>
                     </ImageZoom>
-        
-                    <View style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", borderRadius: 10, padding: 5, margin: 5 }}>
+
+                    <TouchableOpacity style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", borderRadius: 10, padding: 5, margin: 5, alignSelf: "center", width: "100%" }} onPress={() => { track("link", imageScreen); goToLink(JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).link); }}>
                         <Text style={{ fontSize: 20, textAlign: "center" }}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
 
-                        <TouchableOpacity onPress={() => { goToLink(JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).link) }}>
-                            <Text style={styles.action}>{JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).name}</Text>
-                        </TouchableOpacity>
-                    </View>
+                        <Text style={styles.action}>{JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).name}</Text>
+                    </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner)} style={styles.button}>
+                    <TouchableOpacity onPress={() => { changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner); track("wallpaper", imageScreen) }} style={styles.button}>
                         <Text style={styles.button_text}>Set Wallpaper</Text>
                     </TouchableOpacity>
                 </View>
@@ -128,14 +127,6 @@ const CategoryScreen = ({ navigation, route }: any) => {
         )
     );
 };
-
-const goToLink = (link: string) => {
-    if (link != "" && link != null) {
-        Linking.openURL(link).catch(error => {
-
-        })
-    }
-}
 
 const displayCollections = (collections: any, setCollection: any) => {
     const returnCollections = [];
@@ -213,10 +204,57 @@ const displayImages = (collections: any, selectedCollection: any, setImageScreen
     )
 }
 
+var getImageWidth = (url: string) => {
+    var val = 500;
+    Image.getSize(url, (width, height) => {
+        val = width;
+    })
+
+    return val * (PixelRatio.get() / 2);
+}
+
+var getImageHeight = (url: string) => {
+    var val = 500;
+    Image.getSize(url, (width, height) => {
+        val = height;
+    })
+
+    return val * (PixelRatio.get() / 2);
+}
+/**
+ * 
+ * @param type link if link | wallpaper if wallpaper was set
+ * @param imagename 
+ */
+const track = (type: string, imagename: string) => {
+    console.log(imagename);
+
+    fetch(base_url + "/requests/v1/tracking", {
+        method: "POST",
+        headers: {
+            Accept: 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: "apikey="+apiKey.replace("?apikey=", "")+"&type="+type+"&name="+imagename
+    }).then(test => {
+
+    }).catch(error => {
+
+    })
+}
+
+const goToLink = (link: string) => {
+    if (link != "" && link != null) {
+        Linking.openURL(link).catch(error => {
+
+        })
+    }
+}
+
 const changeWallpaper = (url: string, setSpinner: Function) => {
-    Image.getSize(url, (width, height) => {console.log("Image: " + width + "x" + height);});
+    Image.getSize(url, (width, height) => { console.log("Image: " + width + "x" + height); });
     console.log(width + "x" + height);
-    
+
     Alert.alert("Set Wallpaper", "Lock Screen | Home Screen | Both", [
         {
             text: "Both", onPress: () => {
