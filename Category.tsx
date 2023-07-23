@@ -101,7 +101,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={styles.button_text}>Back</Text>
                     </TouchableOpacity>
 
-                    <ImageZoom cropWidth={phonewidth/1.5} cropHeight={phoneheight/1.5} imageHeight={imageHeight} imageWidth={imageWidth} style={{ backgroundColor: "black", alignSelf: "center" }} enableCenterFocus={false} pinchToZoom={true} onMove={(element) => { setImagePos(element) }}>
+                            <ImageZoom cropWidth={phonewidth * 2 / 3} cropHeight={phoneheight * 2 / 3} imageHeight={phoneheight * 2 / 3} imageWidth={imageWidth * ((2 / 3 * phoneheight) / imageHeight)} style={{ backgroundColor: "black", alignSelf: "center" }} enableCenterFocus={false} pinchToZoom={false} onMove={(element) => { setImagePos(element) }} centerOn={{ x: ((-1 / 2 * (imageWidth * ((2 / 3 * phoneheight) / imageHeight))) + (2 / 3 * phonewidth)) * -1, y: 0, scale: 1, duration: 10}}>
                         <ImageBackground style={{ width: "auto", height: "100%" }} source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} onLoad={() => { setImageLoading(false) }}>
                             {
                                 imageLoading ? (
@@ -116,12 +116,12 @@ const CategoryScreen = ({ navigation, route }: any) => {
                     </ImageZoom>
 
                     <TouchableOpacity style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", borderRadius: 10, padding: 5, margin: 5, alignSelf: "center", width: "100%" }} onPress={() => { track("link", imageScreen); goToLink(JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).link); }}>
-                        <Text style={{ fontSize: 20, textAlign: "center" }}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
+                        <Text style={{ fontSize: 15, textAlign: "center" }}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
 
                         <Text style={styles.action}>{JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).name}</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => { changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner, imagePosition); track("wallpaper", imageScreen) }} style={styles.button}>
+                    <TouchableOpacity onPress={() => { changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner, imagePosition); track("wallpaper", imageScreen) }} style={Object.assign({position: "absolute", bottom: 0}, styles.button)}>
                         <Text style={styles.button_text}>Set Wallpaper</Text>
                     </TouchableOpacity>
                 </View>
@@ -208,8 +208,10 @@ const displayImages = (collections: any, selectedCollection: any, setImageScreen
 
 var setImageDimentions = (url: string, setImageWidth: Function, setImageHeight: Function) => {
     Image.getSize(url, (width, height) => {
-        setImageWidth(width * (PixelRatio.get() / 2));
-        setImageHeight(height * (PixelRatio.get() / 2));
+        console.log(width + "x" + height);
+        
+        setImageWidth(width);
+        setImageHeight((height ));
     })
 }
 /**
@@ -246,46 +248,47 @@ const goToLink = (link: string) => {
 
 const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) => {
 
-    setSpinner(false);
     console.log(imagePosition);
-    
+    Image.getSize(url, (width, height) => {
 
-    Alert.alert("Set Wallpaper", "Lock Screen | Home Screen | Both", [
-        {
-            text: "Both", onPress: () => {
-                setSpinner(true);
 
-                setWallpaper(url, "3").then(result => {
-                    setSpinner(false);
-                }).catch(error => {
+        Alert.alert("Set Wallpaper", "Lock Screen | Home Screen | Both", [
+            {
+                text: "Both", onPress: () => {
+                    setSpinner(true);
 
-                })
+                    setWallpaper(url, "3", "0", "0", (width).toString(), (height).toString()).then(result => {
+                        setSpinner(false);
+                    }).catch(error => {
+
+                    })
+                }
+            },
+            {
+                text: "Home", onPress: () => {
+                    setSpinner(true);
+
+                    setWallpaper(url, "1", "0", "0", (width).toString(), (height).toString()).then(result => {
+                        setSpinner(false);
+                    }).catch(error => {
+
+                    })
+                }
+            },
+            {
+                text: "Lock", onPress: () => {
+                    setSpinner(true);
+
+                    setWallpaper(url, "2", "0", "0", (width).toString(), (height).toString()).then(result => {
+                        setSpinner(false);
+                    }).catch(error => {
+
+                    })
+                }
             }
-        },
-        {
-            text: "Home", onPress: () => {
-                setSpinner(true);
-
-                setWallpaper(url, "1").then(result => {
-                    setSpinner(false);
-                }).catch(error => {
-
-                })
-            }
-        },
-        {
-            text: "Lock", onPress: () => {
-                setSpinner(true);
-
-                setWallpaper(url, "2").then(result => {
-                    setSpinner(false);
-                }).catch(error => {
-
-                })
-            }
-        }
-    ]
-    )
+        ]
+        )
+    })
 
 }
 
