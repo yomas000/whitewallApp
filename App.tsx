@@ -21,12 +21,12 @@ import {
 import styles from './Style';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NavigationContainer } from '@react-navigation/native';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import CategoryScreen from "./Category";
 
 import logo from './Icons/appLoading.gif'; // Tell webpack this JS file uses this image
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 
 // import { setWallpaper } from 'react-native-phone-wallpaper';
 const base_url = "https://dev.whitewall.app";
@@ -80,7 +80,7 @@ function App(): JSX.Element {
         </View>
       ) : (
         <NavigationContainer>
-            <Tab.Navigator barStyle={styles.tabStyle} activeColor={styles.tabStyle.activeColor} inactiveColor={styles.tabStyle.inactiveColor} shifting={false}>
+            <Tab.Navigator screenOptions={{ tabBarStyle: styles.tabStyle, tabBarLabelStyle: { fontSize: styles.tabStyle.fontSize, padding: 6 }, headerStyle: {height: 0}}}>
               {Object.keys(data).map((category) => (
                 <Tab.Screen key={category} name={category} component={CategoryScreen} initialParams={{ collections: data[category] }} options={{tabBarIcon: () => {return (<Image source={{ uri: base_url + data[category]["image"] + apiKey }} style={{width: 50, height: 35}}/>)}}}/>))}
             </Tab.Navigator>
