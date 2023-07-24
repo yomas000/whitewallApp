@@ -15,8 +15,8 @@ const styles = StyleSheet.create({
     //categories
     tabStyle: {
         backgroundColor: "white",
-        activeColor: "white",
-        inactiveColor: "white",
+        activeColor: "black",
+        inactiveColor: "black",
         paddingTop: 10,
         height: 70,
         fontSize: 15
