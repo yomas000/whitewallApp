@@ -2,10 +2,11 @@
 
 npm install
 
-echo "\n"
+echo ""
 echo "Setting Icon"
 npx react-native set-icon --path  ../$1
 echo "Icon Set"
+echo ""
 
 cd android
 chmod +x gradlew
