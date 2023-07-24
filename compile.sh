@@ -12,4 +12,4 @@ chmod +x gradlew
 
 ./gradlew bundleRelease
 
-cp app/build/output/bundle/release/app-release.aab ../app-release.aab
+cp app/build/outputs/bundle/release/app-release.aab ../../app-release.aab
