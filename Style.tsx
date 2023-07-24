@@ -121,7 +121,6 @@ const styles = StyleSheet.create({
         height: 700,
         flex: 1,
         alignSelf: "center",
-
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
     },
 
