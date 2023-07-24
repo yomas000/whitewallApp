@@ -101,7 +101,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={styles.button_text}>Back</Text>
                     </TouchableOpacity>
 
-                            <ImageZoom cropWidth={phonewidth * 2 / 3} cropHeight={phoneheight * 2 / 3} imageHeight={phoneheight * 2 / 3} imageWidth={imageWidth * ((2 / 3 * phoneheight) / imageHeight)} style={{ backgroundColor: "black", alignSelf: "center" }} enableCenterFocus={false} pinchToZoom={false} onMove={(element) => { setImagePos(element) }} centerOn={{ x: ((imageWidth * ((2 / 3 * phoneheight) / imageHeight)) / 2) - ((phonewidth * 2/3)) / 2, y: 0, scale: 1, duration: 10}}>
+                    <ImageZoom cropWidth={phonewidth * 2 / 3} cropHeight={phoneheight * 2 / 3} imageHeight={phoneheight * 2 / 3} imageWidth={imageWidth * ((2 / 3 * phoneheight) / imageHeight)} style={{ backgroundColor: "black", alignSelf: "center" }} enableCenterFocus={false} pinchToZoom={false} onMove={(element) => { setImagePos(element) }} centerOn={{ x: ((imageWidth * ((2 / 3 * phoneheight) / imageHeight)) / 2) - ((phonewidth * 2/3)) / 2, y: 0, scale: 1, duration: 10}}>
                         <ImageBackground style={{ width: "auto", height: "100%" }} source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} onLoad={() => { setImageLoading(false) }}>
                             {
                                 imageLoading ? (
