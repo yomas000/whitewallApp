@@ -2,12 +2,14 @@
 
 npm install
 
+echo "\n"
+echo "Setting Icon"
 npx react-native set-icon --path  ../$1
-
 echo "Icon Set"
 
-chmod +x android/gradlew
+cd android
+chmod +x gradlew
 
-./android/gradlew bundleRelease
+./gradlew bundleRelease
 
 cp app/build/output/bundle/release/app-release.aab ../app-release.aab
