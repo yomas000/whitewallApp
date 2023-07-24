@@ -66,7 +66,8 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         borderColor: "white",
         borderRadius: 10,
-        backgroundColor: "white"
+        backgroundColor: "white",
+        shadowColor: "black"
     },
 
     card_label: {
