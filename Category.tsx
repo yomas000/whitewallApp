@@ -26,6 +26,10 @@ const CategoryScreen = ({ navigation, route }: any) => {
     const [imageWidth, setImageWidth] = useState(500);
     const [imageHeight, setImageHeight] = useState(500);
 
+    useEffect(() => {
+       
+    }, [])
+
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('tabPress', (e: any) => {
             setCollection("collections");
@@ -245,16 +249,6 @@ const goToLink = (link: string) => {
         })
     }
 }
-
-const getBranding = () => {
-    return fetch(base_url + '/requests/v1/branding' + apiKey)
-        .then(response => {
-            return response.text()
-        })
-        .catch(error => {
-            console.error("Fetch Data Error: " + error);
-        });
-};
 
 const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) => {
 

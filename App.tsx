@@ -42,6 +42,7 @@ function App(): JSX.Element {
   const [data, setData] = useState(type);
   const [branding, setBranding] = useState(type);
   const [loadingIcon, setIcon] = useState("app");
+  const [appBanner, setBanner] = useState("");
 
   useEffect(() => {
 
@@ -67,6 +68,13 @@ function App(): JSX.Element {
       })
     })
 
+
+    getBranding().then(value => {
+      setBanner(JSON.parse(value).appBanner);
+    }).catch(error => {
+
+    })
+
   }, [])
 
   return (
@@ -79,12 +87,22 @@ function App(): JSX.Element {
           }
         </View>
       ) : (
-        <NavigationContainer>
-            <Tab.Navigator screenOptions={{ tabBarStyle: styles.tabStyle, tabBarLabelStyle: { fontSize: styles.tabStyle.fontSize, padding: 6 }, headerStyle: {height: 0}}}>
-              {Object.keys(data).map((category) => (
-                <Tab.Screen key={category} name={category} component={CategoryScreen} initialParams={{ collections: data[category] }} options={{tabBarIcon: () => {return (<Image source={{ uri: base_url + data[category]["image"] + apiKey }} style={{width: 50, height: 35}}/>)}}}/>))}
-            </Tab.Navigator>
-        </NavigationContainer>
+        <>
+          <NavigationContainer>
+              <Tab.Navigator screenOptions={{ tabBarStyle: styles.tabStyle, tabBarLabelStyle: { fontSize: styles.tabStyle.fontSize, padding: 6 }, headerStyle: {height: 0}}}>
+                {Object.keys(data).map((category) => (
+                  <Tab.Screen key={category} name={category} component={CategoryScreen} initialParams={{ collections: data[category] }} options={{tabBarIcon: () => {return (<Image source={{ uri: base_url + data[category]["image"] + apiKey }} style={{width: 50, height: 35}}/>)}}}/>))}
+              </Tab.Navigator>
+              <View>
+                {appBanner == "" ? (
+                  <></>
+                ) : (
+                  <Image source={{ uri: base_url + appBanner + apiKey }}  style={{width: "100%", height: 70, resizeMode: "cover"}} onError={() => {setBanner("")}}/>
+                )
+                }
+              </View>
+          </NavigationContainer>
+        </>
       )}
     </View>
   );
@@ -92,6 +110,16 @@ function App(): JSX.Element {
 
 const getData = () => {
   return fetch(base_url + '/requests/v1/data' + apiKey)
+    .then(response => {
+      return response.text()
+    })
+    .catch(error => {
+      console.error("Fetch Data Error: " + error);
+    });
+};
+
+const getBranding = () => {
+  return fetch(base_url + '/requests/v1/branding' + apiKey)
     .then(response => {
       return response.text()
     })
