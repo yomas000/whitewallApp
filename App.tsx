@@ -100,16 +100,6 @@ const getData = () => {
     });
 };
 
-const getBranding = () => {
-  return fetch(base_url + '/requests/v1/branding' + apiKey)
-    .then(response => {
-      return response.text()
-    })
-    .catch(error => {
-      console.error("Fetch Data Error: " + error);
-    });
-};
-
 const storeData = async (index: string, value: string) => {
   try {
     await AsyncStorage.setItem(index, value);

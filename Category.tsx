@@ -211,7 +211,7 @@ var setImageDimentions = (url: string, setImageWidth: Function, setImageHeight: 
         console.log(width + "x" + height);
         
         setImageWidth(width);
-        setImageHeight((height ));
+        setImageHeight(height);
     })
 }
 /**
@@ -246,18 +246,36 @@ const goToLink = (link: string) => {
     }
 }
 
+const getBranding = () => {
+    return fetch(base_url + '/requests/v1/branding' + apiKey)
+        .then(response => {
+            return response.text()
+        })
+        .catch(error => {
+            console.error("Fetch Data Error: " + error);
+        });
+};
+
 const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) => {
 
     console.log(imagePosition);
+    
     Image.getSize(url, (width, height) => {
+        const imageSize = Math.round(((width * ((2 / 3 * phoneheight) / height)) / 2) - ((phonewidth * 2 / 3)) / 2)
+        console.log(imageSize);
+        
+        const topLeft = Math.round(scale(Math.round(imagePosition.positionX), imageSize, (imageSize * -1) - (phonewidth), 0, width));
 
+        console.log("Top: " + topLeft + "x" + "0");
+        console.log("Bottom: " + Math.round(topLeft + (phonewidth * PixelRatio.get())) + "x" + height);
+        
 
         Alert.alert("Set Wallpaper", "Lock Screen | Home Screen | Both", [
             {
                 text: "Both", onPress: () => {
                     setSpinner(true);
 
-                    setWallpaper(url, "3", "0", "0", (width).toString(), (height).toString()).then(result => {
+                    setWallpaper(url, "3", topLeft.toString(), "0", Math.round(topLeft + (phonewidth * PixelRatio.get())).toString(), height.toString()).then(result => {
                         setSpinner(false);
                     }).catch(error => {
 
@@ -268,7 +286,7 @@ const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) 
                 text: "Home", onPress: () => {
                     setSpinner(true);
 
-                    setWallpaper(url, "1", "0", "0", (width).toString(), (height).toString()).then(result => {
+                    setWallpaper(url, "1", topLeft.toString(), "0", Math.round(topLeft + (phonewidth * PixelRatio.get())).toString(), height.toString()).then(result => {
                         setSpinner(false);
                     }).catch(error => {
 
@@ -279,7 +297,7 @@ const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) 
                 text: "Lock", onPress: () => {
                     setSpinner(true);
 
-                    setWallpaper(url, "2", "0", "0", (width).toString(), (height).toString()).then(result => {
+                    setWallpaper(url, "2", topLeft.toString(), "0", Math.round(topLeft + (phonewidth * PixelRatio.get())).toString(), height.toString()).then(result => {
                         setSpinner(false);
                     }).catch(error => {
 
@@ -289,6 +307,10 @@ const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) 
         ]
         )
     })
+
+    function scale(number: any, inMin: any, inMax: any, outMin: any, outMax: any) {
+        return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+    }
 
 }
 
