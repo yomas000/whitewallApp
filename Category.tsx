@@ -7,7 +7,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import ImageZoom from 'react-native-image-pan-zoom';
 import header from "./Icons/appHeading.jpeg";
 
-const base_url = "https://dev.whitewall.app";
+const base_url = "https://my.whitewall.app";
 const apiKey = "?apikey=2a41067bfde14602117d84995e53a2543ebf24db36d44c103323e2edb4b6fdb1";
 
 const options = ["Change: Never", "Change: Every Day", "Change: Every other Day", "Change: Every Week"]

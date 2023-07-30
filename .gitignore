@@ -24,6 +24,8 @@ ios/.xcode.env.local
 
 # Android/IntelliJ
 #
+
+#npm install builds this
 build/
 .idea
 .gradle
@@ -65,4 +67,6 @@ yarn-error.log
 
 # testing
 /coverage
+
+#php builds this from branding
 /Icons/*

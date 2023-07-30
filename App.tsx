@@ -29,7 +29,7 @@ import logo from './Icons/appLoading.gif'; // Tell webpack this JS file uses thi
 const Tab = createBottomTabNavigator();
 
 // import { setWallpaper } from 'react-native-phone-wallpaper';
-const base_url = "https://dev.whitewall.app";
+const base_url = "https://my.whitewall.app";
 const apiKey = "?apikey=2a41067bfde14602117d84995e53a2543ebf24db36d44c103323e2edb4b6fdb1";
 
 const exists = false;
