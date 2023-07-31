@@ -18,7 +18,3 @@ chmod +x gradlew
 
 cp app/build/outputs/bundle/release/app-release.aab ../../app-release.aab
 cp app/build/outputs/apk/release/app-release.apk ../../app-release.apk
-
-echo "enter sudo password to delete app directory"
-cd ../../
-rm -R ../whitewallApp
