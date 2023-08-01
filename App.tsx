@@ -30,7 +30,7 @@ const Tab = createBottomTabNavigator();
 
 // import { setWallpaper } from 'react-native-phone-wallpaper';
 const base_url = "https://my.whitewall.app";
-const apiKey = "?apikey=2a41067bfde14602117d84995e53a2543ebf24db36d44c103323e2edb4b6fdb1";
+const apiKey = "?apikey=44ac52f9e0ad7e45e632d719b8b0e16cb89caa4e225b9828189c2c4abb297e98";
 
 const exists = false;
 

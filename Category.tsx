@@ -8,11 +8,12 @@ import ImageZoom from 'react-native-image-pan-zoom';
 import header from "./Icons/appHeading.jpeg";
 
 const base_url = "https://my.whitewall.app";
-const apiKey = "?apikey=2a41067bfde14602117d84995e53a2543ebf24db36d44c103323e2edb4b6fdb1";
+const apiKey = "?apikey=44ac52f9e0ad7e45e632d719b8b0e16cb89caa4e225b9828189c2c4abb297e98";
 
 const options = ["Change: Never", "Change: Every Day", "Change: Every other Day", "Change: Every Week"]
 const phonewidth = Dimensions.get('window').width;
 const phoneheight = Dimensions.get('window').height;
+const framescale = 2/3;
 
 const CategoryScreen = ({ navigation, route }: any) => {
     var collections = route.params.collections.collections;
@@ -25,10 +26,6 @@ const CategoryScreen = ({ navigation, route }: any) => {
     const [imagePosition, setImagePos] = useState<Object>();
     const [imageWidth, setImageWidth] = useState(500);
     const [imageHeight, setImageHeight] = useState(500);
-
-    useEffect(() => {
-       
-    }, [])
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('tabPress', (e: any) => {
@@ -105,11 +102,11 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={styles.button_text}>Back</Text>
                     </TouchableOpacity>
 
-                    <ImageZoom cropWidth={phonewidth * 2 / 3} cropHeight={phoneheight * 2 / 3} imageHeight={phoneheight * 2 / 3} imageWidth={imageWidth * ((2 / 3 * phoneheight) / imageHeight)} style={{ backgroundColor: "black", alignSelf: "center" }} enableCenterFocus={false} pinchToZoom={false} onMove={(element) => { setImagePos(element) }} centerOn={{ x: ((imageWidth * ((2 / 3 * phoneheight) / imageHeight)) / 2) - ((phonewidth * 2/3)) / 2, y: 0, scale: 1, duration: 10}}>
+                    <ImageZoom cropWidth={phonewidth * 2 / 3} cropHeight={phoneheight * 2 / 3} imageHeight={phoneheight * 2 / 3} imageWidth={imageWidth * ((2 / 3 * phoneheight) / imageHeight)} style={{ backgroundColor: "black", alignSelf: "center" }} enableCenterFocus={false} pinchToZoom={false} onMove={(element) => { setImagePos(element) }} centerOn={{ x: 0, y: 0, scale: 1, duration: 10}}>
                         <ImageBackground style={{ width: "auto", height: "100%" }} source={{ uri: base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey }} onLoad={() => { setImageLoading(false) }}>
                             {
                                 imageLoading ? (
-                                    <View style={{ flex: 1, justifyContent: "center", position: "absolute", top: (phoneheight * 2/3) / 2, left: ((phoneheight * 2/3) / 4)  }}>
+                                    <View style={{ flex: 1, justifyContent: "center"}}>
                                         <ActivityIndicator size={"large"} />
                                     </View>
                                 ) : (
@@ -125,7 +122,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                         <Text style={styles.action}>{JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).name}</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => { changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner, imagePosition); track("wallpaper", imageScreen) }} style={Object.assign({position: "absolute", bottom: 0}, styles.button)}>
+                            <TouchableOpacity onPress={() => { console.log(collections[selectedCollection]["images"][imageScreen]); changeWallpaper(base_url + collections[selectedCollection]["images"][imageScreen]["imagePath"] + apiKey, setSpinner, imagePosition, collections[selectedCollection]["images"][imageScreen]["width"], collections[selectedCollection]["images"][imageScreen]["height"]); track("wallpaper", imageScreen) }} style={Object.assign({position: "absolute", bottom: 0}, styles.button)}>
                         <Text style={styles.button_text}>Set Wallpaper</Text>
                     </TouchableOpacity>
                 </View>
@@ -212,8 +209,6 @@ const displayImages = (collections: any, selectedCollection: any, setImageScreen
 
 var setImageDimentions = (url: string, setImageWidth: Function, setImageHeight: Function) => {
     Image.getSize(url, (width, height) => {
-        console.log(width + "x" + height);
-        
         setImageWidth(width);
         setImageHeight(height);
     })
@@ -250,26 +245,28 @@ const goToLink = (link: string) => {
     }
 }
 
-const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) => {
+const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any, imageWidth: number, imageHeight: number) => {
 
     console.log(imagePosition);
     
-    Image.getSize(url, (width, height) => {
-        const imageSize = Math.round(((width * ((2 / 3 * phoneheight) / height)) / 2) - ((phonewidth * 2 / 3)) / 2)
-        console.log(imageSize);
-        
-        const topLeft = Math.round(scale(Math.round(imagePosition.positionX), imageSize, (imageSize * -1) - (phonewidth), 0, width));
+        imageWidth = imageWidth;
+        imageHeight = imageHeight;
 
-        console.log("Top: " + topLeft + "x" + "0");
-        console.log("Bottom: " + Math.round(topLeft + (phonewidth * PixelRatio.get())) + "x" + height);
-        
+        const left = Math.floor((((((phoneheight * framescale) / imageHeight) * imageWidth) / 2) - Math.floor(imagePosition.positionX) - ((phonewidth * framescale) / 2)) / ((((phoneheight * framescale) / imageHeight) * imageWidth) / imageWidth));
+        const top = 0;
+        const right = Math.floor((((((phoneheight * framescale) / imageHeight) * imageWidth) / 2) - Math.floor(imagePosition.positionX) + ((phonewidth * framescale) / 2)) / (((phoneheight * framescale / imageHeight) * imageWidth) / imageWidth));
+        const bottom = imageHeight;
+
+        console.log("size: " + imageWidth + "x" + imageHeight);
+        console.log("Top: " + left + "x" + top);
+        console.log("Bottom: " + right + "x" + bottom);
 
         Alert.alert("Set Wallpaper", "Lock Screen | Home Screen | Both", [
             {
                 text: "Both", onPress: () => {
                     setSpinner(true);
 
-                    setWallpaper(url, "3", topLeft.toString(), "0", Math.round(topLeft + (phonewidth * PixelRatio.get())).toString(), height.toString()).then(result => {
+                    setWallpaper(url, "3", left.toString(), top.toString(), right.toString(), bottom.toString()).then(result => {
                         setSpinner(false);
                     }).catch(error => {
 
@@ -280,7 +277,7 @@ const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) 
                 text: "Home", onPress: () => {
                     setSpinner(true);
 
-                    setWallpaper(url, "1", topLeft.toString(), "0", Math.round(topLeft + (phonewidth * PixelRatio.get())).toString(), height.toString()).then(result => {
+                    setWallpaper(url, "1", left.toString(), top.toString(), right.toString(), bottom.toString()).then(result => {
                         setSpinner(false);
                     }).catch(error => {
 
@@ -291,20 +288,15 @@ const changeWallpaper = (url: string, setSpinner: Function, imagePosition: any) 
                 text: "Lock", onPress: () => {
                     setSpinner(true);
 
-                    setWallpaper(url, "2", topLeft.toString(), "0", Math.round(topLeft + (phonewidth * PixelRatio.get())).toString(), height.toString()).then(result => {
+                    setWallpaper(url, "2", left.toString(), top.toString(), right.toString(), bottom.toString()).then(result => {
                         setSpinner(false);
                     }).catch(error => {
 
                     })
                 }
             }
-        ]
+        ], {cancelable: true}
         )
-    })
-
-    function scale(number: any, inMin: any, inMax: any, outMin: any, outMax: any) {
-        return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-    }
 
 }
 
