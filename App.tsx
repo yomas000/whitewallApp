@@ -43,6 +43,7 @@ function App(): JSX.Element {
   const [branding, setBranding] = useState(type);
   const [loadingIcon, setIcon] = useState("app");
   const [appBanner, setBanner] = useState("");
+  const [status, setStatus] = useState("active");
 
   useEffect(() => {
 
@@ -51,10 +52,21 @@ function App(): JSX.Element {
       
       setData(JSON.parse(String(thing)));
 
-      storeData("data", JSON.stringify(thing)).then(value => {
-        setLoading(false);
-      }).catch(reason => {
-        console.log("Storing Data failed: " + reason);
+      getBranding().then(value => {
+        setBanner(JSON.parse(value).appBanner);
+        setStatus(JSON.parse(value).status);
+
+        if (JSON.parse(value).status != "active") {
+          setLoading(true);
+        }else{
+          storeData("data", JSON.stringify(thing)).then(value => {
+            setLoading(false);
+          }).catch(reason => {
+            console.log("Storing Data failed: " + reason);
+          })
+        }
+      }).catch(error => {
+
       })
 
     }).catch(reason => {
@@ -68,13 +80,6 @@ function App(): JSX.Element {
       })
     })
 
-
-    getBranding().then(value => {
-      setBanner(JSON.parse(value).appBanner);
-    }).catch(error => {
-
-    })
-
   }, [])
 
   return (
@@ -84,6 +89,13 @@ function App(): JSX.Element {
         <View style={{ flex: 1, justifyContent: 'center', backgroundColor: styles.background.backgroundColor }}>
           {
             <Image source={logo} style={styles.loading} resizeMode='contain'/>
+          }
+          {
+            status == "active" ? (
+              <></>
+            ) : (
+              <Text style={{color: "black", alignSelf: "center", fontSize: 15, paddingBottom: 50}}>We're sorry this service is not avalible right now</Text>
+            )
           }
         </View>
       ) : (
