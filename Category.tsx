@@ -13,7 +13,7 @@ const apiKey = "?apikey=44ac52f9e0ad7e45e632d719b8b0e16cb89caa4e225b9828189c2c4a
 const options = ["Change: Never", "Change: Every Day", "Change: Every other Day", "Change: Every Week"]
 const phonewidth = Dimensions.get('window').width;
 const phoneheight = Dimensions.get('window').height;
-const framescale = 2/3;
+const framescale = 1/2;
 
 const CategoryScreen = ({ navigation, route }: any) => {
     var collections = route.params.collections.collections;
