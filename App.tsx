@@ -15,7 +15,8 @@ import {
   ScrollView,
   Button,
   TouchableOpacity,
-  StatusBar
+  StatusBar,
+  Linking
 } from 'react-native';
 
 import styles from './Style';
@@ -44,6 +45,7 @@ function App(): JSX.Element {
   const [loadingIcon, setIcon] = useState("app");
   const [appBanner, setBanner] = useState("");
   const [status, setStatus] = useState("active");
+  const [bannerLink, setBannerLink] = useState("");
 
   useEffect(() => {
 
@@ -55,6 +57,7 @@ function App(): JSX.Element {
       getBranding().then(value => {
         setBanner(JSON.parse(value).appBanner);
         setStatus(JSON.parse(value).status);
+        setBannerLink(JSON.parse(JSON.parse(value).branding).bannerLink);
 
         if (JSON.parse(value).status != "active") {
           setLoading(true);
@@ -109,7 +112,9 @@ function App(): JSX.Element {
                 {appBanner == "" ? (
                   <></>
                 ) : (
-                  <Image source={{ uri: base_url + appBanner + apiKey }}  style={{width: "100%", height: 70, resizeMode: "cover"}} onError={() => {setBanner("")}}/>
+                  <TouchableOpacity onPress={() => {goToLink(bannerLink)}}>
+                    <Image source={{ uri: base_url + appBanner + apiKey }}  style={{width: "100%", height: 70, resizeMode: "cover"}} onError={() => {setBanner("")}}/>
+                  </TouchableOpacity>
                 )
                 }
               </View>
@@ -156,5 +161,13 @@ const getStoredData = async (key: string) => {
     console.log("reading error: " + e);
   }
 };
+
+const goToLink = (link: string) => {
+  if (link != "" && link != null) {
+    Linking.openURL(link).catch(error => {
+
+    })
+  }
+}
 
 export default App;
