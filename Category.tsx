@@ -68,7 +68,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
         selectedCollection == "collections" ? (
             <>
                 <View style={styles.header_container}>
-                    <TouchableOpacity onPress={() => {goToLink(headerLink)}}>
+                    <TouchableOpacity onPress={() => {goToLink(headerLink)}} style={{flex: 1}}>
                         <Image source={header} style={styles.header} resizeMode='contain' />
                     </TouchableOpacity>
                 </View>
