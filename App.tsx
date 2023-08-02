@@ -46,6 +46,7 @@ function App(): JSX.Element {
   const [appBanner, setBanner] = useState("");
   const [status, setStatus] = useState("active");
   const [bannerLink, setBannerLink] = useState("");
+  const [headerLink, setHeaderLink] = useState("");
 
   useEffect(() => {
 
@@ -58,6 +59,7 @@ function App(): JSX.Element {
         setBanner(JSON.parse(value).appBanner);
         setStatus(JSON.parse(value).status);
         setBannerLink(JSON.parse(JSON.parse(value).branding).bannerLink);
+        setHeaderLink(JSON.parse(JSON.parse(value).branding).headerLink);
 
         if (JSON.parse(value).status != "active") {
           setLoading(true);
@@ -106,7 +108,7 @@ function App(): JSX.Element {
           <NavigationContainer>
               <Tab.Navigator screenOptions={{ tabBarStyle: styles.tabStyle, tabBarLabelStyle: { fontSize: styles.tabStyle.fontSize, padding: 6 }, headerStyle: {height: 0}}}>
                 {Object.keys(data).map((category) => (
-                  <Tab.Screen key={category} name={category} component={CategoryScreen} initialParams={{ collections: data[category] }} options={{tabBarIcon: () => {return (<Image source={{ uri: base_url + data[category]["image"] + apiKey }} style={{width: 50, height: 35}}/>)}}}/>))}
+                  <Tab.Screen key={category} name={category} component={CategoryScreen} initialParams={{ collections: data[category], headerLink: headerLink }} options={{tabBarIcon: () => {return (<Image source={{ uri: base_url + data[category]["image"] + apiKey }} style={{width: 50, height: 35}}/>)}}}/>))}
               </Tab.Navigator>
               <View>
                 {appBanner == "" ? (

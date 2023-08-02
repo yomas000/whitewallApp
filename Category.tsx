@@ -13,10 +13,11 @@ const apiKey = "?apikey=44ac52f9e0ad7e45e632d719b8b0e16cb89caa4e225b9828189c2c4a
 const options = ["Change: Never", "Change: Every Day", "Change: Every other Day", "Change: Every Week"]
 const phonewidth = Dimensions.get('window').width;
 const phoneheight = Dimensions.get('window').height;
-const framescale = 1/2;
+const framescale = 0.55;
 
 const CategoryScreen = ({ navigation, route }: any) => {
     var collections = route.params.collections.collections;
+    var headerLink = route.params.headerLink;
     var [selectedCollection, setCollection] = useState("collections");
     var [imageScreen, setImageScreen] = useState("None");
     var [spinner, setSpinner] = useState(false);
@@ -67,7 +68,9 @@ const CategoryScreen = ({ navigation, route }: any) => {
         selectedCollection == "collections" ? (
             <>
                 <View style={styles.header_container}>
-                    <Image source={header} style={styles.header} resizeMode='contain' />
+                    <TouchableOpacity onPress={() => {goToLink(headerLink)}}>
+                        <Image source={header} style={styles.header} resizeMode='contain' />
+                    </TouchableOpacity>
                 </View>
                 <ScrollView style={styles.background}>
                     <View style={{ flex: 1, alignItems: "center", justifyContent: 'center', paddingBottom: 25 }}>
@@ -115,6 +118,7 @@ const CategoryScreen = ({ navigation, route }: any) => {
                             }
                         </ImageBackground>
                     </ImageZoom>
+                    <Text style={{color: "rgba(0,0,0,0.6)", alignSelf: "center", fontWeight: "bold"}}>You can drag the image to recenter</Text>
 
                     <TouchableOpacity style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", borderRadius: 10, padding: 5, margin: 5, alignSelf: "center", width: "100%" }} onPress={() => { track("link", imageScreen); goToLink(JSON.parse(collections[selectedCollection]["images"][imageScreen]["action"]).link); }}>
                         <Text style={{ fontSize: 15, textAlign: "center" }}>{collections[selectedCollection]["images"][imageScreen]["description"]}</Text>
